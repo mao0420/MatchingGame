@@ -68,6 +68,9 @@
             secondClicked = clickedLabel
             secondClicked.ForeColor = Color.Black
 
+            ' プレーヤーがクリア条件を満たしているか確認します。
+            CheckForWinner()
+
             ' プレイヤーがクリックしたアイコンが一致している場合、
             ' それらのアイコンは黒色のままにしてfirstClickedとsecondClickedをリセットします。
             If firstClicked.Text = secondClicked.Text Then
@@ -86,7 +89,7 @@
         ' タイマーを止める。
         Timer1.Stop()
 
-        ' アイコンを隠す。
+        ' アイコンを背景色と同じ色に戻す。
         firstClicked.ForeColor = firstClicked.BackColor
         secondClicked.ForeColor = secondClicked.BackColor
 
@@ -95,5 +98,21 @@
         secondClicked = Nothing
     End Sub
 
+    Private Sub CheckForWinner()
+
+        ' TableLayoutPanel内のすべてのラベルを調べます、
+        ' それぞれのアイコンで背景と文字色が同じかをチェックする。
+        For Each control In TableLayoutPanel1.Controls
+            Dim iconLabel = TryCast(control, Label)
+            If iconLabel IsNot Nothing AndAlso
+               iconLabel.ForeColor = iconLabel.BackColor Then Exit Sub
+        Next
+
+        ' 同じ物がない場合は、すべてのアイコンを一致させられているため、クリア処理を行う。
+        ' メッセージを表示してフォームを閉じます。
+        MessageBox.Show("全てのアイコンを一致させました！", "Congratulations")
+        Close()
+
+    End Sub
 
 End Class
