@@ -29,11 +29,22 @@
         AssignIconsToSquares()
     End Sub
 
+
+    ' firstClickedは、最初にクリックしたラベルを指します。 
+    Private firstClicked As Label = Nothing
+
+    ' secondClickedは2番目にクリックしたラベルを指します。
+    Private secondClicked As Label = Nothing
+
     Private Sub label_Click(ByVal sender As System.Object,
                         ByVal e As System.EventArgs) Handles Label1.Click,
     Label2.Click, Label3.Click, Label4.Click, Label5.Click, Label6.Click,
     Label7.Click, Label8.Click, Label9.Click, Label10.Click, Label11.Click,
     Label12.Click, Label13.Click, Label14.Click, Label15.Click, Label16.Click
+
+        ' マッチしないアイコンが2つ表示されてる場合、タイマーが作動しているため、
+        ' タイマー作動中はクリック動作を無視します。
+        If Timer1.Enabled Then Exit Sub
 
         Dim clickedLabel = TryCast(sender, Label)
 
@@ -43,8 +54,46 @@
             ' 既にクリックされている為、クリックを無視する。 
             If clickedLabel.ForeColor = Color.Black Then Exit Sub
 
-            clickedLabel.ForeColor = Color.Black
+            ' firstClickedがNothingの場合、これはプレーヤーがクリックしたペアの最初のアイコンなので、
+            ' プレーヤーがクリックしたラベルにfirstClickedを設定し、その色を黒に変更してreturnを返します。
+            If firstClicked Is Nothing Then
+                firstClicked = clickedLabel
+                firstClicked.ForeColor = Color.Black
+                Exit Sub
+            End If
+
+            ' ここが動作する際はタイマーが作動しておらず、firstClickedはNothingではないため、
+            ' プレーヤーがクリックしたペアの2番目のアイコンとなります。
+            ' プレーヤーがクリックしたラベルにsecondClickedを設定し、その色を黒に変更してreturnを返します。
+            secondClicked = clickedLabel
+            secondClicked.ForeColor = Color.Black
+
+            ' プレイヤーがクリックしたアイコンが一致している場合、
+            ' それらのアイコンは黒色のままにしてfirstClickedとsecondClickedをリセットします。
+            If firstClicked.Text = secondClicked.Text Then
+                firstClicked = Nothing
+                secondClicked = Nothing
+                Exit Sub
+            End If
+
+            ' ここが動作する際はプレイヤーが2つの異なるアイコンをクリックしているため、
+            ' タイマーをスタートさせる。(タイマー終了時にアイコンを隠してfirstClickedとsecondClickedをリセットする。)
+            Timer1.Start()
         End If
     End Sub
+
+    Private Sub Timer1_Tick(sender As Object, e As EventArgs) Handles Timer1.Tick
+        ' タイマーを止める。
+        Timer1.Stop()
+
+        ' アイコンを隠す。
+        firstClicked.ForeColor = firstClicked.BackColor
+        secondClicked.ForeColor = secondClicked.BackColor
+
+        ' firstClickedとsecondClickedをリセットする。
+        firstClicked = Nothing
+        secondClicked = Nothing
+    End Sub
+
 
 End Class
